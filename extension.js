@@ -1,11 +1,78 @@
-const St = imports.gi.St;
-const Gio = imports.gi.Gio;
+const {Gio, GObject} = imports.gi;
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
+const QuickSettings = imports.ui.quickSettings;
 
+
+const FeatureToggle = GObject.registerClass(
+class FeatureToggle extends QuickSettings.QuickToggle {
+    _init() {
+        super._init({
+            title: 'Screen Keyboard',
+            iconName: 'input-keyboard-symbolic',
+            toggleMode: true,
+        });
+        
+        // NOTE: In GNOME 44, the `label` property must be set after
+        // construction. The newer `title` property can be set at construction.
+        this.label = 'Screen Keyboard';
+
+        // Binding the toggle to a GSettings key
+        this._settings = new Gio.Settings({
+            schema_id: 'org.gnome.desktop.a11y.applications',
+        });
+
+        this._settings.bind('screen-keyboard-enabled',
+            this, 'checked',
+            Gio.SettingsBindFlags.DEFAULT);
+    }
+});
+
+// This is the live instance of the Quick Settings menu
+const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
+
+
+const FeatureIndicator = GObject.registerClass(
+class FeatureIndicator extends QuickSettings.SystemIndicator {
+    _init() {
+        super._init();
+
+        // Create the icon for the indicator
+        this._indicator = this._addIndicator();
+        this._indicator.icon_name = 'input-keyboard-symbolic';
+
+        // Showing the indicator when the feature is enabled
+        this._settings = new Gio.Settings({
+            schema_id: 'org.gnome.desktop.a11y.applications',
+        });
+
+        this._settings.bind('screen-keyboard-enabled',
+            this._indicator, 'visible',
+            Gio.SettingsBindFlags.DEFAULT);
+        
+        // Create the toggle and associate it with the indicator, being sure to
+        // destroy it along with the indicator
+        this.quickSettingsItems.push(new FeatureToggle());
+        
+        this.connect('destroy', () => {
+            this.quickSettingsItems.forEach(item => item.destroy());
+        });
+        
+        // Add the indicator to the panel and the toggle to the menu
+        QuickSettingsMenu._indicators.add_child(this);
+        QuickSettingsMenu._addItems(this.quickSettingsItems);
+    }
+    
+    // To add your toggle above another item, such as Background Apps, add it
+    // using the built-in function, then move them afterwards.
+    _addItems(items) {
+        QuickSettingsMenu._addItems(items);
+
+        for (const item of items) {
+            QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
+                QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
+        }
+    }
+});
 
 class Extension {
     constructor() {
@@ -13,38 +80,15 @@ class Extension {
     }
     
     enable() {
-        log(`enabling ${Me.metadata.name}`);
-
-        let indicatorName = `${Me.metadata.name} Indicator`;
-        
-        // Create a panel button
-        this._indicator = new PanelMenu.Button(0.0, indicatorName, false);
-        
-        // Add an icon
-        let icon = new St.Icon({
-            gicon: new Gio.ThemedIcon({name: 'face-laugh-symbolic'}),
-            style_class: 'system-status-icon'
-        });
-        this._indicator.add_child(icon);
-
-        // `Main.panel` is the actual panel you see at the top of the screen,
-        // not a class constructor.
-        Main.panel.addToStatusArea(indicatorName, this._indicator);
+        this._indicator = new FeatureIndicator();
     }
     
-    // REMINDER: It's required for extensions to clean up after themselves when
-    // they are disabled. This is required for approval during review!
     disable() {
-        log(`disabling ${Me.metadata.name}`);
-
         this._indicator.destroy();
         this._indicator = null;
     }
 }
 
-
 function init() {
-    log(`initializing ${Me.metadata.name}`);
-    
     return new Extension();
 }

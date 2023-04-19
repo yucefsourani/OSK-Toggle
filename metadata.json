@@ -1,7 +1,7 @@
 {
-  "name": "OSK Action Button",
-  "description": "Adds an Action Button to toggle On-Screen-Keyboard to Quick-Settings",
-  "uuid": "osk-action-button@papierfliegr.github.com",
+  "name": "OSK Toggle",
+  "description": "Adds Toggle for On-Screen-Keyboard to Quick-Settings",
+  "uuid": "osk-toggle@papierfliegr.github.com",
   "shell-version": [
     "44"
   ]
