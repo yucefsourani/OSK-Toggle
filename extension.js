@@ -55,7 +55,7 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
         });
         
         // Add the indicator to the panel and the toggle to the menu
-        QuickSettingsMenu._indicators.add_child(this);
+        QuickSettingsMenu._indicators.insert_child_at_index(this, 1);
         QuickSettingsMenu._addItems(this.quickSettingsItems);
         
     
