@@ -4,5 +4,7 @@
   "uuid": "osk-toggle@papierfliegr.github.com",
   "shell-version": [
     "44"
-  ]
+  ],
+  "version": 1,
+  "url": "https://github.com/PapierFliegr/OSK-Toggle"
 }
