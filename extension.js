@@ -3,6 +3,16 @@ const QuickSettings = imports.ui.quickSettings;
 const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
 const Main = imports.ui.main;
 
+function addQuickSettingsItems(items) {
+    // Add the items with the built-in function
+    QuickSettingsMenu._addItems(items);
+
+    // Ensure the tile(s) are above the background apps menu
+    for (const item of items) {
+        QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
+            QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
+    }
+};
 
 const FeatureToggle = GObject.registerClass(
 class FeatureToggle extends QuickSettings.QuickToggle {
@@ -56,21 +66,22 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
         
         // Add the indicator to the panel and the toggle to the menu
         QuickSettingsMenu._indicators.insert_child_at_index(this, 1);
-        QuickSettingsMenu._addItems(this.quickSettingsItems);
+        addQuickSettingsItems(this.quickSettingsItems);
+        // QuickSettingsMenu._addItems(this.quickSettingsItems);
         
     
     }
     
-    // To add your toggle above another item, such as Background Apps, add it
-    // using the built-in function, then move them afterwards.
-    _addItems(items) {
-        QuickSettingsMenu._addItems(items);
+    // // To add your toggle above another item, such as Background Apps, add it
+    // // using the built-in function, then move them afterwards.
+    // _addItems(items) {
+    //     QuickSettingsMenu._addItems(items);
 
-        for (const item of items) {
-            QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
-                QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
-        } 
-    }
+    //     for (const item of items) {
+    //         QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
+    //             QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
+    //     } 
+    // }
 });
 
 class Extension {
@@ -100,3 +111,4 @@ class Extension {
 function init() {
     return new Extension();
 }
+
