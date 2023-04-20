@@ -29,7 +29,7 @@ class FeatureToggle extends QuickSettings.QuickToggle {
 
 // This is the live instance of the Quick Settings menu
 const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
-
+//const PanelMenu = imports.ui.
 
 const FeatureIndicator = GObject.registerClass(
 class FeatureIndicator extends QuickSettings.SystemIndicator {
@@ -60,6 +60,8 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
         // Add the indicator to the panel and the toggle to the menu
         QuickSettingsMenu._indicators.add_child(this);
         QuickSettingsMenu._addItems(this.quickSettingsItems);
+        
+    
     }
     
     // To add your toggle above another item, such as Background Apps, add it
@@ -70,22 +72,33 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
         for (const item of items) {
             QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
                 QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
-        }
+        } 
     }
 });
+
+const Main = imports.ui.main;
 
 class Extension {
     constructor() {
         this._indicator = null;
+        
     }
     
     enable() {
         this._indicator = new FeatureIndicator();
+        let a11y = Main.panel.statusArea["a11y"];
+        if (a11y != null) {
+            a11y.container.hide();
+        }
     }
     
     disable() {
         this._indicator.destroy();
         this._indicator = null;
+        let a11y = Main.panel.statusArea["a11y"];
+        if (a11y != null) {
+            a11y.container.show();
+        }
     }
 }
 
