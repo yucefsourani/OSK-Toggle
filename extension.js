@@ -1,6 +1,7 @@
 const {Gio, GObject} = imports.gi;
-
 const QuickSettings = imports.ui.quickSettings;
+const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
+const Main = imports.ui.main;
 
 
 const FeatureToggle = GObject.registerClass(
@@ -26,10 +27,6 @@ class FeatureToggle extends QuickSettings.QuickToggle {
             Gio.SettingsBindFlags.DEFAULT);
     }
 });
-
-// This is the live instance of the Quick Settings menu
-const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
-//const PanelMenu = imports.ui.
 
 const FeatureIndicator = GObject.registerClass(
 class FeatureIndicator extends QuickSettings.SystemIndicator {
@@ -75,8 +72,6 @@ class FeatureIndicator extends QuickSettings.SystemIndicator {
         } 
     }
 });
-
-const Main = imports.ui.main;
 
 class Extension {
     constructor() {
